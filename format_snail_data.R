@@ -8,7 +8,7 @@ library(tidyverse)
 # data --------------------------------------------------------------------
 
 df_habitat <- read_csv("data_raw/proj_snail_habitat.csv")
-df_tag <- read_csv("data_raw/proj_snail_tag_data.csv")
+df_tag <- read_csv("data_raw/proj_snail_tag.csv")
 
 
 # data manipulation -------------------------------------------------------
@@ -17,13 +17,15 @@ df_tag <- read_csv("data_raw/proj_snail_tag_data.csv")
 ## substrates are divided by 25 because we assessed substrates for 25 grids
 
 df_count <- df_tag %>% 
- group_by(Transect, Quadrat) %>% 
+ group_by(Occasion, Transect, Quadrat) %>% 
  summarize(Date = unique(Date),
            Count = n())
 
 df_h <- df_habitat %>% 
- select(Transect,
+ select(Occasion = Ocassion,
+        Transect,
         Quadrat,
+        Width,
         Depth,
         Velocity,
         BR:SL,
@@ -47,10 +49,9 @@ df_h <- df_habitat %>%
 # combine data frames -----------------------------------------------------
 
 df_snail <- df_h %>% 
- left_join(df_count, by = c("Transect", "Quadrat")) %>% 
+ left_join(df_count, by = c("Occasion","Transect", "Quadrat")) %>% 
  mutate(Count = ifelse(is.na(Count),
                        0,
                        Count))
 
-#write_csv(df_snail,
-#          file = "data_format/proj_snail_count_env.csv")
+#write.csv(df_snail, file = "data_format/proj_snail_count_env_20210823.csv")
